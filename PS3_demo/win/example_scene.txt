@@ -1,0 +1,100 @@
+#lines beginning with # and blank lines are ignored
+
+#viewing parameters
+#(image plane is defined to be 1 unit from the eye in the viewing
+#direction)
+#
+#eye x,y,z
+#look at point x,y,z
+#up vector x,y,z
+#y field of view degrees
+
+camera
+0.0 0.0 0.0
+0.0 0.0 -100.0
+0.0 1.0 0.0
+30.0
+
+#ambient light
+#
+#intensity r, g, b
+
+ambientLight
+0.1 0.1 0.1
+
+#direction light
+#
+#intensity r, g, b
+#direction x, y, z
+
+directionLight
+0.3 0.0 0.0
+1.0 1.0 1.0
+
+#point lights
+#
+#intensity r,g,b
+#position x,y,z
+
+pointLight
+0.0 300.0 0.0
+30.0 10.0 -50.0
+
+pointLight
+0.0 0.0 100.0
+-5.0 0.0 -30.0
+
+#material
+#
+#color r,g,b
+#Phong cosine exponent
+#specular fraction
+
+material
+1.0 1.0 1.0
+50.0
+0.0
+
+#triangles
+#
+#vertex1 x,y,z
+#vertex2 x,y,z
+#vertex3 x,y,z
+
+triangle
+5.0 2.5 -50.0
+15.0 2.5 -50.0
+15.0 12.5 -50.0
+
+triangle
+5.0 2.5 -50.0
+15.0 12.5 -50.0
+5.0 12.5 -50.0
+
+material
+1.0 1.0 1.0
+50.0
+0.75
+
+#spheres
+#
+#center x,y,z
+#radius
+
+sphere
+10.0 5.0 -47.5
+1.0
+
+triangle
+-10.0 -10.0 -60.0
+20.0 -10.0 -60.0
+20.0 20.0 -60.0
+
+material
+1.0 1.0 1.0
+50.0
+0.5
+
+sphere
+-15.0 15.0 -50.0
+10.0

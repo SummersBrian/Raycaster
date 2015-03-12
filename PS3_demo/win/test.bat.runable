@@ -1,0 +1,8 @@
+RayTracing.exe ambient_light_triangle_sphere.txt ambient_light_triangle_sphere.bmp 640 480
+RayTracing.exe direction_light_diffuse_sphere.txt direction_light_diffuse_sphere.bmp 512 512
+RayTracing.exe direction_light_specular_sphere.txt direction_light_specular_sphere.bmp 256 256
+RayTracing.exe point_lights_diffuse_triangels.txt point_lights_diffuse_triangels.bmp 512 512
+RayTracing.exe shadow_point_lights_diffuse_triangels.txt shadow_point_lights_diffuse_triangels.bmp 512 256
+RayTracing.exe shadow_point_lights_specular_triangels.txt shadow_point_lights_specular_triangels.bmp 480 512
+RayTracing.exe hall_of_mirrors.txt hall_of_mirrors.bmp 640 512
+RayTracing.exe example_scene.txt example_scene.bmp 1024 768
