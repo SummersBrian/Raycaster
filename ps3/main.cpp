@@ -42,17 +42,20 @@ int main (int argc, char** argv) {
 	float pWidth = pHeight * (imageWidth / imageHeight);
 	Vector3 pImageCenter = Vector3(0, 0, -1);
 	Vector3 pLowerLeft = pImageCenter - theScene.getEyeRight() * (pWidth / 2) - theScene.getEyeUp() * (imageHeight / 2);
+	float pPixelWidth = pWidth / imageWidth, pPixelHeight = pHeight / imageHeight;
 
 	//for each pixel in the BMPImage
 	//starting world coordinate positions, top left of image is (xmin, ymax)
-	int xPos = -(imageWidth / 2);
-	for (int i = 0; i < imageWidth; i++) {
-		xPos += i;
-		int yPos = imageHeight / 2;
-		for (int j = 0; j < imageHeight; j++) {
-			yPos -= j;
+	int yPixPos = imageHeight / 2;
+	for (int i = 0; i < imageHeight; i++) {
+		yPixPos += i;
+		int xPixPos = -(imageWidth / 2);
+		for (int j = 0; j < imageWidth; j++) {
+			xPixPos -= j;
 			//cast a ray from the focal point through the pixel
-			//Vector3;
+			//a pixel at pixel image (i,j) has location
+			Vector3 pPixelLocation = pLowerLeft + theScene.getEyeRight() * i * pPixelWidth + theScene.getEyeUp() * j * pPixelHeight;
+			Vector3 ray = theScene.getEyePosition() + (pPixelLocation - theScene.getEyePosition());
 		}
 	}
 
