@@ -10,6 +10,7 @@ Brian Summers - 110656609
 
 #include "BMPImage.h"
 #include "scene.h"
+#include "point3.h"
 
 using namespace std;
 
@@ -48,14 +49,20 @@ int main (int argc, char** argv) {
 	//starting world coordinate positions, top left of image is (xmin, ymax)
 	int yPixPos = imageHeight / 2;
 	for (int i = 0; i < imageHeight; i++) {
-		yPixPos += i;
+		yPixPos -= i;
 		int xPixPos = -(imageWidth / 2);
 		for (int j = 0; j < imageWidth; j++) {
-			xPixPos -= j;
+			xPixPos += j;
 			//cast a ray from the focal point through the pixel
 			//a pixel at pixel image (i,j) has location
 			Vector3 pPixelLocation = pLowerLeft + theScene.getEyeRight() * i * pPixelWidth + theScene.getEyeUp() * j * pPixelHeight;
 			Vector3 ray = theScene.getEyePosition() + (pPixelLocation - theScene.getEyePosition());
+
+			//for each shape in the scene
+			float t_min = FLT_MIN;
+			for (int k = 0; k < theScene.getCountShapes(); k++) {
+				if (theScene.getShapes()[k])
+			}
 		}
 	}
 

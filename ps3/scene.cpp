@@ -13,6 +13,10 @@ Scene::Scene() :
 	eyeUp(0, 1, 0),
 	fieldOfViewY(20),
 	ambientLight(0, 0, 0) {
+
+	countShapes = 0;
+	maxShapes = 10;
+	shapes = new Shape[maxShapes];
 }
 
 int Scene::parse(const char *inputFileName) {
@@ -135,6 +139,20 @@ int Scene::parse(const char *inputFileName) {
 
 			//TODO
 			//add triangles
+			countShapes++;
+			if (countShapes >= maxShapes) {
+				maxShapes *= 2;
+				Shape *temp = new Shape[maxShapes];
+				for (int i = 0; i < countShapes; i++) {
+					temp[i] = shapes[i];
+				}
+				delete[] shapes;
+				shapes = temp;
+			}
+			else {
+				shapes[countShapes - 1] = Triangle(Vector3(x1, y1, z1), Vector3(x2, y2, z2), Vector3(x3, y3, z3));
+			}
+
 		}
 
 		//read sphere
@@ -149,6 +167,19 @@ int Scene::parse(const char *inputFileName) {
 
 			//TODO
 			//add spheres
+			countShapes++;
+			if (countShapes >= maxShapes) {
+				maxShapes *= 2;
+				Shape *temp = new Shape[maxShapes];
+				for (int i = 0; i < countShapes; i++) {
+					temp[i] = shapes[i];
+				}
+				delete[] shapes;
+				shapes = temp;
+			}
+			else {
+				shapes[countShapes - 1] = Sphere(x,y,z,radius);
+			}
 		}
 
 		else {

@@ -1,50 +1,38 @@
 #ifndef SHAPE_H
 #define SHAPE_H
 
+#include "vector3.h"
+
 class Shape {
 public:
 	Shape();
-};
-
-class Point : public Shape {
-public:
-	Point();
-	Point(float x, float y, float z) { 
-		this->x = x;
-		this->y = y;
-		this->z = z;
-	}
-	float getX() { return x; }
-	float getY() { return y; }
-	float getZ() { return z; }
-
-private:
-	float x;
-	float y;
-	float z;
+	float virtual intersect(Vector3 ray);
 };
 
 class Line : public Shape {
 public:
 	Line();
-	Line(Point start, Point end) {
+	Line(Vector3 start, Vector3 end) {
 		this->start = start;
 		this->end = end;
 	}
-	const Point &getStartPoint() const { return start; }
-	const Point &getendPoint() const { return end; }
+	const Vector3 &getStartPoint() const { return start; }
+	const Vector3 &getendPoint() const { return end; }
 
 private:
-	Point start;
-	Point end;
+	Vector3 start;
+	Vector3 end;
 };
 
 class Triangle : public Shape {
 public:
-	Triangle(Point a, Point b, Point c) {
+	Triangle(Vector3 a, Vector3 b, Vector3 c) {
 		ab = Line(a, b);
 		bc = Line(b, c);
 		ca = Line(c, a);
+	}
+	float intersect(Vector3 ray) {
+		
 	}
 
 private:
@@ -56,17 +44,17 @@ private:
 class Sphere : public Shape {
 public:
 	Sphere();
-	Sphere(Point center, float radius) {
+	Sphere(Vector3 center, float radius) {
 		c = center;
 		r = radius;
 	}
 	Sphere(float x, float y, float z, float radius) {
-		c = Point(x, y, z);
+		c = Vector3(x, y, z);
 		r = radius;
 	}
 
 private:
-	Point c;
+	Vector3 c;
 	float r;
 };
 #endif

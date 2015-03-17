@@ -3,6 +3,7 @@
 
 #include "vector3.h"
 #include "color.h"
+#include "shape.h"
 
 class Scene {
 public:
@@ -19,6 +20,10 @@ public:
 
 	const Color &getAmbientLight() const {return ambientLight;}
 
+	Shape *getShapes() { return shapes; }
+	int getCountShapes() { return countShapes; }
+	int getMaxShapes() { return maxShapes; }
+
 private:
 	Vector3 eyePosition;
 	Vector3 eyeDirection;
@@ -27,6 +32,10 @@ private:
 	float fieldOfViewY;
 
 	Color ambientLight;
+
+	Shape *shapes;
+	int maxShapes;
+	int countShapes;
 };
 
 #endif
