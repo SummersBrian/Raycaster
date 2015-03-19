@@ -10,7 +10,6 @@ Brian Summers - 110656609
 
 #include "BMPImage.h"
 #include "scene.h"
-#include "point3.h"
 
 using namespace std;
 
@@ -20,6 +19,8 @@ using namespace std;
 //argv[3] - image pixel width
 //argv[4] - image pixel height
 int main (int argc, char** argv) {
+	const float PI = 3.1415927;
+
 	if (argc != 5) {
 		cout << "Usage: " << argv[0] << " inputFile outputFile imageWidth imageHeight" << endl;
 		return 1;
@@ -39,29 +40,38 @@ int main (int argc, char** argv) {
 	//raytrace the scene
 
 	//image plane setup
-	float pHeight = tan(theScene.getFieldOfViewY() / 2) * -2;
-	float pWidth = pHeight * (imageWidth / imageHeight);
-	Vector3 pImageCenter = Vector3(0, 0, -1);
-	Vector3 pLowerLeft = pImageCenter - theScene.getEyeRight() * (pWidth / 2) - theScene.getEyeUp() * (imageHeight / 2);
-	float pPixelWidth = pWidth / imageWidth, pPixelHeight = pHeight / imageHeight;
+	float pThetaYRad = PI * (theScene.getFieldOfViewY() / 180); //y-field of view in radians
+	float pAspectRatio = imageWidth / imageHeight; //window's aspect ratio
+	float pHeight = 2 * tan(pThetaYRad / 2);
+	float pWidth = pHeight * pAspectRatio;
+	//Vector3 pImageCenter = Vector3(0, 0, -1);
+	//float pPixelWidth = pWidth / imageWidth, pPixelHeight = pHeight / imageHeight;
 
 	//for each pixel in the BMPImage
-	//starting world coordinate positions, top left of image is (xmin, ymax)
-	int yPixPos = imageHeight / 2;
+	//starting world coordinate positions, top left of image is (0, 0)
 	for (int i = 0; i < imageHeight; i++) {
-		yPixPos -= i;
-		int xPixPos = -(imageWidth / 2);
+		float rowVertOffset = -pHeight * ( ( i / imageHeight ) - 0.5 ); //vertical offset for the row
 		for (int j = 0; j < imageWidth; j++) {
-			xPixPos += j;
-			//cast a ray from the focal point through the pixel
-			//a pixel at pixel image (i,j) has location
-			Vector3 pPixelLocation = pLowerLeft + theScene.getEyeRight() * i * pPixelWidth + theScene.getEyeUp() * j * pPixelHeight;
-			Vector3 ray = theScene.getEyePosition() + (pPixelLocation - theScene.getEyePosition());
 
+			//cast a ray from the focal point through the pixel
+			float colHorizOffset = pWidth * ( ( j / imageWidth ) - 0.5); //horizontal offset for the column
+			Vector3 pixelPointLocation = theScene.getEyePosition() + (theScene.getEyeRight() * colHorizOffset) 
+				+ ( theScene.getEyeUp() * rowVertOffset ) - ( theScene.getEyeDirection() * -1.0f ); //location of the pixel in the image
+			Vector3 rayDirection = pixelPointLocation - theScene.getEyePosition(); //direction vector for the ray from eye to pixel
+			rayDirection.normalize();
+			
 			//for each shape in the scene
-			float t_min = FLT_MIN;
+			float t_0 = FLT_MAX;
+			float t_prime = t_0;
+			Vector3 surfaceNormal = Vector3();
 			for (int k = 0; k < theScene.getCountShapes(); k++) {
-				if (theScene.getShapes()[k])
+				
+				//get the intersection of the ray and the shape - returns the value of t_prime for the intersection and gets the surface normal
+				t_prime = theScene.getShapes()[k].intersect(pixelPointLocation,rayDirection,t_0,surfaceNormal);
+
+				if (t_prime < t_0) {
+					t_0 = t_prime;
+				}
 			}
 		}
 	}
