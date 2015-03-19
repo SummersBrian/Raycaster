@@ -2,26 +2,12 @@
 #define SHAPE_H
 
 #include "vector3.h"
+#include <cmath>
 
 class Shape {
 public:
 	Shape() {}
 	float virtual intersect(Vector3 origin, Vector3 direction, float t, Vector3 &surfaceNormal) { return t; }
-};
-
-class Line : public Shape {
-public:
-	Line();
-	Line(Vector3 start, Vector3 end) {
-		this->start = start;
-		this->end = end;
-	}
-	const Vector3 &getStartPoint() const { return start; }
-	const Vector3 &getendPoint() const { return end; }
-
-private:
-	Vector3 start;
-	Vector3 end;
 };
 
 class Triangle : public Shape {
@@ -40,7 +26,7 @@ public:
 
 		//equation for plane : ax + by + cz + d = 0
 		// here a = normal.x, b = normal.y, c = normal.z
-		//float pl_d = -1.0f * ( ( normal.getX() * tr_a.getX() ) + ( normal.getY() * tr_a.getY() ) + ( normal.getZ() * tr_a.getZ() ) );
+		float pl_d = -1.0f * ( ( normal.getX() * tr_a.getX() ) + ( normal.getY() * tr_a.getY() ) + ( normal.getZ() * tr_a.getZ() ) );
 		float denominator = (normal.getX() * direction.getX()) + (normal.getY() * direction.getY()) + (normal.getZ() * direction.getZ());
 
 		//if denominator is zero, then the ray is parallel to the plane containing the triangle
@@ -48,7 +34,7 @@ public:
 			return t;
 		}
 		else {
-			float t_0 = -1.0f * (((normal.getX() * origin.getX()) + (normal.getY() * origin.getY()) + (normal.getZ() * origin.getZ()))
+			float t_0 = -1.0f * (((normal.getX() * origin.getX()) + (normal.getY() * origin.getY()) + (normal.getZ() * origin.getZ()) + pl_d)
 				/ denominator);
 
 			//if t_0 is less than 0, then the intersection is behind the camera's view - ignore it
@@ -60,6 +46,9 @@ public:
 				Vector3 intersection = origin + (direction * t_0); //point of intersection
 				
 				if (pointInTriangle(intersection, tr_a, tr_b, tr_c)) {
+					//if there is an intersection with the triangle, we also want the surface normal
+					surfaceNormal = normal;
+					surfaceNormal.normalize();
 					return t_0;
 				}
 				else {
@@ -137,6 +126,47 @@ public:
 	Sphere(float x, float y, float z, float radius) {
 		c = Vector3(x, y, z);
 		r = radius;
+	}
+
+	float intersect(Vector3 origin, Vector3 direction, float t, Vector3 &surfaceNormal) {
+		Vector3 w_vec = c - origin;
+		const double TINY = 1E-3;
+
+		//quadratic constants
+		double q_a = 1; // direction.dot(direction) = 1 since direction is normalized
+		double q_b = (direction.dot(w_vec)) * -2.0;
+		double q_c = w_vec.dot(w_vec) - (r * r);
+		double det = (q_b * q_b) - ((q_a * q_c) * 4.0);
+
+		if (det >= TINY) {
+			double t_minus = ((q_b * -1.0) - sqrt(det)) / 2.0;
+			double t_plus = ((q_b * -1.0) + sqrt(det)) / 2.0;
+
+			//t_minus is the smallest and is greater than 0
+			if (t_minus > TINY) {
+				//calculate surface normal
+				Vector3 normal = origin + (direction * t_minus) - c;
+				surfaceNormal = normal;
+				surfaceNormal.normalize();
+				return t_minus;
+			}
+			//t_minus is less than 0, but t_plus is greater than 0 and so is the smallest
+			else if (t_plus > TINY) {
+				//calculate surface normal
+				Vector3 normal = origin + (direction * t_plus) - c;
+				surfaceNormal = normal;
+				surfaceNormal.normalize();
+				return t_plus;
+			}
+			//both are less than 0
+			else {
+				return t;
+			}
+		}
+		//there is no root
+		else {
+			return t;
+		}
 	}
 
 private:

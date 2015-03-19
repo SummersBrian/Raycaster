@@ -63,16 +63,19 @@ int main (int argc, char** argv) {
 			//for each shape in the scene
 			float t_0 = FLT_MAX;
 			float t_prime = t_0;
+			Shape closest;
 			Vector3 surfaceNormal = Vector3();
 			for (int k = 0; k < theScene.getCountShapes(); k++) {
-				
 				//get the intersection of the ray and the shape - returns the value of t_prime for the intersection and gets the surface normal
 				t_prime = theScene.getShapes()[k].intersect(pixelPointLocation,rayDirection,t_0,surfaceNormal);
 
 				if (t_prime < t_0) {
 					t_0 = t_prime;
+					closest = theScene.getShapes()[k];
 				}
 			}
+
+			//compute color at intersection point
 		}
 	}
 
