@@ -118,7 +118,7 @@ public:
 	//uses sameSide() to determine if the intersection is within the triangle by comparing with all edges
 	bool pointInTriangle(Vector3 intersection, Vector3 vertexA, Vector3 vertexB, Vector3 vertexC) {
 		return sameSide(intersection, vertexC, vertexA, vertexB) && sameSide(intersection, vertexA, vertexB, vertexC) &&
-			sameSide(intersection, vertexB, vertexC, vertexA);
+			sameSide(intersection, vertexB, vertexA, vertexC);
 	}
 
 private:
