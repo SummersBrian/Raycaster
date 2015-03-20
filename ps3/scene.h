@@ -20,9 +20,9 @@ public:
 
 	const Color &getAmbientLight() const {return ambientLight;}
 
-	Shape *getShapes() { return shapes; }
-	int getCountShapes() { return countShapes; }
-	int getMaxShapes() { return maxShapes; }
+	Shape *getShapes() const { return shapes; }
+	int getCountShapes() const { return countShapes; }
+	int getMaxShapes() const { return maxShapes; }
 
 private:
 	Vector3 eyePosition;

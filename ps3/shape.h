@@ -2,12 +2,21 @@
 #define SHAPE_H
 
 #include "vector3.h"
+#include "material.h"
 #include <cmath>
 
 class Shape {
 public:
 	Shape() {}
+
 	float virtual intersect(Vector3 origin, Vector3 direction, float t, Vector3 &surfaceNormal) { return t; }
+
+	const Material &getMaterial() const { return material; }
+	
+	void setMaterial(Material newMaterial) { material = newMaterial; }
+
+private:
+	Material material;
 };
 
 class Triangle : public Shape {

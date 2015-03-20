@@ -49,10 +49,11 @@ int main (int argc, char** argv) {
 
 	//for each pixel in the BMPImage
 	//starting world coordinate positions, top left of image is (0, 0)
+
 	for (int i = 0; i < imageHeight; i++) {
 		float rowVertOffset = -pHeight * ( ( i / imageHeight ) - 0.5 ); //vertical offset for the row
 		for (int j = 0; j < imageWidth; j++) {
-
+			
 			//cast a ray from the focal point through the pixel
 			float colHorizOffset = pWidth * ( ( j / imageWidth ) - 0.5); //horizontal offset for the column
 			Vector3 pixelPointLocation = theScene.getEyePosition() + (theScene.getEyeRight() * colHorizOffset) 
@@ -76,9 +77,11 @@ int main (int argc, char** argv) {
 			}
 
 			//compute color at intersection point
+			Color newColor = closest.getMaterial().getColor() * theScene.getAmbientLight();
+			newColor.normalize();
+			theImage.writePixel(j, i, newColor.getR(), newColor.getG(), newColor.getB());
 		}
 	}
-
 
 	if (theImage.save(argv[2]) != 1) {
 		return 1;

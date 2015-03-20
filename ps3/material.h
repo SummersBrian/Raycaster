@@ -12,6 +12,14 @@ public:
 		this->specularFrac = specularFrac;
 	}
 
+	const Color &getColor() const { return color; }
+	float getPhongExp() const { return phongExp; }
+	float getSpecularFrac() const { return specularFrac; }
+
+	void setColor(Color newColor) { color = newColor; }
+	void setPhongExp(float newPhongExp) { phongExp = newPhongExp; }
+	void setSpecularFrac(float newSpecularFrac) { specularFrac = newSpecularFrac; }
+
 private:
 	Color color;
 	float phongExp;

@@ -3,6 +3,7 @@
 #include "shape.h"
 #include "vector3.cpp"
 #include "scene.h"
+
 #include <cassert>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -104,6 +105,5 @@ namespace ps3_test1
 			t_prime = s.intersect(eye, direction, t_0, surfaceNormal);
 			Assert::IsFalse(t_prime < t_0);
 		}
-
 	};
 }

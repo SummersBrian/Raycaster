@@ -21,6 +21,7 @@ Scene::Scene() :
 
 int Scene::parse(const char *inputFileName) {
 	fstream inputFile;
+	Material m;
 
 	inputFile.open(inputFileName, fstream::in);
 
@@ -123,6 +124,8 @@ int Scene::parse(const char *inputFileName) {
 
 			//TODO
 			//store current material setting
+			Color color = Color(r, g, b);
+			m = Material(color, phongExponent, specularFraction);
 		}
 
 		//read triangle
@@ -150,7 +153,9 @@ int Scene::parse(const char *inputFileName) {
 				shapes = temp;
 			}
 			else {
-				shapes[countShapes - 1] = Triangle(Vector3(x1, y1, z1), Vector3(x2, y2, z2), Vector3(x3, y3, z3));
+				Triangle tr = Triangle(Vector3(x1, y1, z1), Vector3(x2, y2, z2), Vector3(x3, y3, z3));
+				tr.setMaterial(m);
+				shapes[countShapes - 1] = tr;
 			}
 
 		}
@@ -178,7 +183,9 @@ int Scene::parse(const char *inputFileName) {
 				shapes = temp;
 			}
 			else {
-				shapes[countShapes - 1] = Sphere(x,y,z,radius);
+				Sphere s = Sphere(x, y, z, radius);
+				s.setMaterial(m);
+				shapes[countShapes - 1] = s;
 			}
 		}
 

@@ -1,0 +1,43 @@
+#lines beginning with # and blank lines are ignored
+
+#viewing parameters
+#image plane is defined to be 1 unit from the eye in the viewing direction
+#
+#eye x,y,z
+#look at point x,y,z
+#up vector x,y,z
+#y field of view degrees
+
+camera
+0.0 0.0 0.0
+0.0 0.0 -100.0
+0.0 1.0 0.0
+30.0
+
+#ambient light
+#
+#intensity r, g, b
+
+ambientLight
+1.0 1.0 1.0
+
+#material parameters
+#
+#color r,g,b
+#Phong cosine exponent
+#specular fraction
+
+material
+0.7 0.0 0.0
+50.0
+0.0
+
+#triangles
+#
+#vertex1 x,y,z
+#vertex2 x,y,z
+#vertex3 x,y,z
+
+-1.0 -1.0 -2.0
+1.0 -1.0 -2.0
+0.0 1.0 -2.0
