@@ -7,7 +7,7 @@
 
 class Shape {
 public:
-	Shape() {}
+	//Shape() {}
 
 	float virtual intersect(Vector3 origin, Vector3 direction, float t, Vector3 &surfaceNormal) { return t; }
 
@@ -27,11 +27,12 @@ public:
 		tr_c = c;
 	}
 	float intersect(Vector3 origin, Vector3 direction, float t, Vector3 &surfaceNormal) {
-
+		const float TINY = 0.01;
 		//get the normal of the plane
 		Vector3 tr_ab = tr_b - tr_a;
 		Vector3 tr_ac = tr_c - tr_a;
 		Vector3 normal = tr_ab.cross(tr_ac);
+		normal.normalize();
 
 		//equation for plane : ax + by + cz + d = 0
 		// here a = normal.x, b = normal.y, c = normal.z
@@ -43,12 +44,12 @@ public:
 			return t;
 		}
 		else {
-			float t_0 = -1.0f * (((normal.getX() * origin.getX()) + (normal.getY() * origin.getY()) + (normal.getZ() * origin.getZ()) + pl_d)
+			float t_0 = -1.0f * (((normal.getX() * origin.getX()) + (normal.getY() * origin.getY()) + (normal.getZ() * origin.getZ() + pl_d))
 				/ denominator);
 
 			//if t_0 is less than 0, then the intersection is behind the camera's view - ignore it
 			//if t_0 is less than the parameter t, then we found a closer intersection than t
-			if (t_0 < t && t_0 > 0) {
+			if (t_0 < t && t_0 > TINY) {
 				
 				//check to see if ray intersects the triangle - if point of intersection is in the triangle
 				//using orthographic projection to check - ignoring z values
@@ -71,43 +72,24 @@ public:
 
 	}
 
-	/*
-		This function tests to see if the intersection point is on the same side as the compareVertex using orthographic projection.
-		After projection, all the points will remain in the same orientation/direction relative to one another, so the point will not
-		change sides after projection.
-
-		intersection is the point of interest
-		compareVertex is the vertex on the triangle we're using to compare to see if the intersection is on the same side
-		testVertex1 and testVertex2 make up the edge we are testing the intersection with
-
-		Let triangle ABC have vertices A at (0,0), B at (2,0) and C at (1,1). We wish to see which side point P is on with respect
-		to the edge we are testing. Let testVertex1 = A, testVertex2 = B, testEdge = testVertex2 - testVertex1, and let 
-		compareVertex = C. We take the dot product of C-A with testEdge. We then take the dot product of P-A with testEdge and 
-		compare the signs of the two dot products. If they both have the same sign, then P is on the same side of AB as vertex C is.
-
-		Use this test in conjuction with pointInTriangle() to test the intersection with all three edges of the triangle.
-	*/
-	bool sameSide(Vector3 intersection, Vector3 compareVertex, Vector3 testVertex1, Vector3 testVertex2) {
+	bool sameSide(Vector3 intersection, Vector3 vertexC, Vector3 vertexA, Vector3 vertexB) {
 		//using orthographic project -- ignore z values
 		intersection.setZ(0.0f);
-		compareVertex.setZ(0.0f);
-		testVertex1.setZ(0.0f);
-		testVertex2.setZ(0.0f);
+		vertexC.setZ(0.0f);
+		vertexA.setZ(0.0f);
+		vertexB.setZ(0.0f);
 
-		Vector3 testEdge = testVertex2 - testVertex1;
-		Vector3 aToIntersection = intersection - testVertex1;
-		Vector3 compareEdge = compareVertex - testVertex1;
+		//everything in relation to vertexA
+		Vector3 testVector = vertexB - vertexA; //vector from A to another vertex on triangle
+		Vector3 intersectVector = intersection - vertexA; //vector from A to point of intersection
+		Vector3 compareVector = vertexC - vertexA; //vector from A to C
 
-		float compareDir = testEdge.dot(compareEdge);
-		float intersectDir = testEdge.dot(aToIntersection);
+		Vector3 cross1 = testVector.cross(intersectVector);
+		Vector3 cross2 = testVector.cross(compareVector);
 
-		//the point of intersection is on the testEdge -- it's on the edge -- same side
-		//both are on the same side
-		if (intersectDir == 0 || (intersectDir > 0 && compareDir > 0)
-				|| (intersectDir < 0 && compareDir < 0)) {
+		if (cross1.dot(cross2) >= 0) {
 			return true;
 		}
-		//intersection is on opposite side
 		else {
 			return false;
 		}

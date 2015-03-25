@@ -16,7 +16,7 @@ Scene::Scene() :
 
 	countShapes = 0;
 	maxShapes = 10;
-	shapes = new Shape[maxShapes];
+	shapes = new Shape*[maxShapes];
 }
 
 int Scene::parse(const char *inputFileName) {
@@ -145,7 +145,7 @@ int Scene::parse(const char *inputFileName) {
 			countShapes++;
 			if (countShapes >= maxShapes) {
 				maxShapes *= 2;
-				Shape *temp = new Shape[maxShapes];
+				Shape **temp = new Shape*[maxShapes];
 				for (int i = 0; i < countShapes; i++) {
 					temp[i] = shapes[i];
 				}
@@ -153,8 +153,8 @@ int Scene::parse(const char *inputFileName) {
 				shapes = temp;
 			}
 			else {
-				Triangle tr = Triangle(Vector3(x1, y1, z1), Vector3(x2, y2, z2), Vector3(x3, y3, z3));
-				tr.setMaterial(m);
+				Triangle *tr = new Triangle(Vector3(x1, y1, z1), Vector3(x2, y2, z2), Vector3(x3, y3, z3));
+				tr->setMaterial(m);
 				shapes[countShapes - 1] = tr;
 			}
 
@@ -175,7 +175,7 @@ int Scene::parse(const char *inputFileName) {
 			countShapes++;
 			if (countShapes >= maxShapes) {
 				maxShapes *= 2;
-				Shape *temp = new Shape[maxShapes];
+				Shape **temp = new Shape*[maxShapes];
 				for (int i = 0; i < countShapes; i++) {
 					temp[i] = shapes[i];
 				}
@@ -183,8 +183,8 @@ int Scene::parse(const char *inputFileName) {
 				shapes = temp;
 			}
 			else {
-				Sphere s = Sphere(x, y, z, radius);
-				s.setMaterial(m);
+				Sphere *s = new Sphere(x, y, z, radius);
+				s->setMaterial(m);
 				shapes[countShapes - 1] = s;
 			}
 		}

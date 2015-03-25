@@ -44,31 +44,33 @@ int main (int argc, char** argv) {
 	float pAspectRatio = imageWidth / imageHeight; //window's aspect ratio
 	float pHeight = 2 * tan(pThetaYRad / 2);
 	float pWidth = pHeight * pAspectRatio;
+	float halfXOffset = 1.0f / (2.0f * imageWidth);
+	float halfYOffset = 1.0f / (2.0f * imageHeight);
 	//Vector3 pImageCenter = Vector3(0, 0, -1);
 	//float pPixelWidth = pWidth / imageWidth, pPixelHeight = pHeight / imageHeight;
 
 	//for each pixel in the BMPImage
 	//starting world coordinate positions, top left of image is (0, 0)
 
-	for (int i = 0; i < imageHeight; i++) {
-		float rowVertOffset = -pHeight * ( ( i / imageHeight ) - 0.5 ); //vertical offset for the row
+	for (int i = 1; i <= imageHeight; i++) {
+		float rowVertOffset = pHeight * (( (float) i / imageHeight) - 0.5f); //vertical offset for the row
 		for (int j = 0; j < imageWidth; j++) {
 			
 			//cast a ray from the focal point through the pixel
-			float colHorizOffset = pWidth * ( ( j / imageWidth ) - 0.5); //horizontal offset for the column
+			float colHorizOffset = pWidth*(( (float) j / imageWidth ) - 0.5f); //horizontal offset for the column
 			Vector3 pixelPointLocation = theScene.getEyePosition() + (theScene.getEyeRight() * colHorizOffset) 
 				+ ( theScene.getEyeUp() * rowVertOffset ) - ( theScene.getEyeDirection() * -1.0f ); //location of the pixel in the image
 			Vector3 rayDirection = pixelPointLocation - theScene.getEyePosition(); //direction vector for the ray from eye to pixel
-			rayDirection.normalize();
+ 			rayDirection.normalize();
 			
 			//for each shape in the scene
 			float t_0 = FLT_MAX;
 			float t_prime = t_0;
-			Shape closest;
+			Shape *closest = NULL;
 			Vector3 surfaceNormal = Vector3();
 			for (int k = 0; k < theScene.getCountShapes(); k++) {
 				//get the intersection of the ray and the shape - returns the value of t_prime for the intersection and gets the surface normal
-				t_prime = theScene.getShapes()[k].intersect(pixelPointLocation,rayDirection,t_0,surfaceNormal);
+				t_prime = theScene.getShapes()[k]->intersect(pixelPointLocation, rayDirection, t_0, surfaceNormal);
 
 				if (t_prime < t_0) {
 					t_0 = t_prime;
@@ -77,9 +79,14 @@ int main (int argc, char** argv) {
 			}
 
 			//compute color at intersection point
-			Color newColor = closest.getMaterial().getColor() * theScene.getAmbientLight();
-			newColor.normalize();
-			theImage.writePixel(j, i, newColor.getR(), newColor.getG(), newColor.getB());
+			if (closest != 0) {
+				Color newColor = closest->getMaterial().getColor() * theScene.getAmbientLight();
+				newColor.normalize();
+				theImage.writePixel(j, i-1, newColor.getR(), newColor.getG(), newColor.getB());
+			}
+			else {
+				theImage.writePixel(j, i-1, 0.0f, 0.0f, 0.0f);
+			}
 		}
 	}
 

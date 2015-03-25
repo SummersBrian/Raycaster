@@ -38,6 +38,16 @@ material
 #vertex2 x,y,z
 #vertex3 x,y,z
 
--1.0 -1.0 -2.0
-1.0 -1.0 -2.0
-0.0 1.0 -2.0
+triangle
+5.0 0.0 -50.0
+15.0 0.0 -50.0
+15.0 10.0 -50.0
+
+#spheres
+#
+#center x,y,z
+#radius
+
+sphere
+-10.0 10.0 -40
+10.0

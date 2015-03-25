@@ -17,13 +17,13 @@ namespace ps3_test1
 		TEST_METHOD(TestPointInTriangle)
 		{
 			Vector3 a = Vector3(0, 0, 0);
-			Vector3 b = Vector3(2, 0, 0);
+			Vector3 b = Vector3(1, 0, 0);
 			Vector3 c = Vector3(1, 1, 0);
 			Triangle t = Triangle(a, b, c);
 			
-			Assert::AreEqual(t.pointInTriangle(Vector3(1.0, 0.5, 0), a, b, c), true); //inside
+			Assert::AreEqual(t.pointInTriangle(Vector3(0.9, 0.1, 0), a, b, c), true); //inside
 			Assert::AreEqual(t.pointInTriangle(Vector3(-1, -1, 0),a,b,c), false); //outside
-			Assert::AreEqual(t.pointInTriangle(Vector3(1, 0, 0), a, b, c), true); //on an edge
+			Assert::AreEqual(t.pointInTriangle(Vector3(0.5, 0, 0), a, b, c), true); //on an edge
 			Assert::AreEqual(t.pointInTriangle(Vector3(0, 0, 0), a, b, c), true); //on vertex
 		}
 

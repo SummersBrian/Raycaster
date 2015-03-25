@@ -20,7 +20,7 @@ public:
 
 	const Color &getAmbientLight() const {return ambientLight;}
 
-	Shape *getShapes() const { return shapes; }
+	Shape **getShapes() const { return shapes; }
 	int getCountShapes() const { return countShapes; }
 	int getMaxShapes() const { return maxShapes; }
 
@@ -33,7 +33,7 @@ private:
 
 	Color ambientLight;
 
-	Shape *shapes;
+	Shape **shapes;
 	int maxShapes;
 	int countShapes;
 };
