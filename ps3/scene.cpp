@@ -17,6 +17,10 @@ Scene::Scene() :
 	countShapes = 0;
 	maxShapes = 10;
 	shapes = new Shape*[maxShapes];
+
+	maxLights = 5;
+	countLights = 0;
+	lights = new Light*[maxLights];
 }
 
 int Scene::parse(const char *inputFileName) {
@@ -94,6 +98,18 @@ int Scene::parse(const char *inputFileName) {
 
 			//TODO
 			//add direction lights
+			countLights++;
+			if (countLights >= maxLights) {
+				maxLights *= 2;
+				Light **temp = new Light*[maxLights];
+				for (int i = 0; i < countLights; i++)
+					temp[i] = lights[i];
+				delete[] lights;
+				lights = temp;
+			}
+			else {
+				lights[countLights - 1] = new DirectionLight(r, g, b, x, y, z);
+			}
 		}
 
 		//read point light
@@ -108,6 +124,18 @@ int Scene::parse(const char *inputFileName) {
 
 			//TODO
 			//add point lights
+			countLights++;
+			if (countLights >= maxLights) {
+				maxLights *= 2;
+				Light **temp = new Light*[maxLights];
+				for (int i = 0; i < countLights; i++)
+					temp[i] = lights[i];
+				delete[] lights;
+				lights = temp;
+			}
+			else {
+				lights[countLights - 1] = new PointLight(r, g, b, x, y, z);
+			}
 		}
 
 		//read material

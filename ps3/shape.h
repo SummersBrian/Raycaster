@@ -58,7 +58,6 @@ public:
 				if (pointInTriangle(intersection, tr_a, tr_b, tr_c)) {
 					//if there is an intersection with the triangle, we also want the surface normal
 					surfaceNormal = normal;
-					surfaceNormal.normalize();
 					return t_0;
 				}
 				else {

@@ -4,6 +4,7 @@
 #include "vector3.h"
 #include "color.h"
 #include "shape.h"
+#include "light.h"
 
 class Scene {
 public:
@@ -24,6 +25,11 @@ public:
 	int getCountShapes() const { return countShapes; }
 	int getMaxShapes() const { return maxShapes; }
 
+	Light **getLights() const { return lights; }
+	int getCountLights() const { return countLights; }
+	int getMaxLights() const { return maxLights; }
+
+
 private:
 	Vector3 eyePosition;
 	Vector3 eyeDirection;
@@ -36,6 +42,10 @@ private:
 	Shape **shapes;
 	int maxShapes;
 	int countShapes;
+
+	Light **lights;
+	int maxLights;
+	int countLights;
 };
 
 #endif
