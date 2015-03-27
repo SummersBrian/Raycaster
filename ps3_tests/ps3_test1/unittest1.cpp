@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
-#include "shape.h"
+/*#include "shape.h"
 #include "vector3.cpp"
 #include "scene.h"
 
@@ -67,7 +67,7 @@ namespace ps3_test1
 			direction.normalize();
 			t_prime = t.intersect(eye, direction, t_0, surfaceNormal);
 			Assert::IsFalse(t_prime < t_0);
-			*/
+			
 			
 		}
 
@@ -84,7 +84,7 @@ namespace ps3_test1
 			direction.normalize();
 			float t_0 = FLT_MAX;
 			Vector3 surfaceNormal = Vector3();
-			/*
+			
 			float t_prime = s.intersect(eye, direction, t_0, surfaceNormal);
 			Assert::IsTrue(t_prime < t_0);
 
@@ -105,7 +105,8 @@ namespace ps3_test1
 			direction.normalize();
 			t_prime = s.intersect(eye, direction, t_0, surfaceNormal);
 			Assert::IsFalse(t_prime < t_0);
-			*/
+			
 		}
 	};
 }
+*/

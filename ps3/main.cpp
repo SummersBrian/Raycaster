@@ -13,7 +13,7 @@ Brian Summers - 110656609
 
 using namespace std;
 
-Color trace(Scene scene, Vector3 origin, Vector3 direction);
+Color trace(Scene scene, Vector3 origin, Vector3 direction, int recursiveStep);
 
 //argv[0] - program name
 //argv[1] - scene file name
@@ -64,7 +64,7 @@ int main (int argc, char** argv) {
  			rayDirection.normalize();
 
 			//shoot a ray into the scene passing through pixel
-			Color c = trace(theScene, pixelPointLocation, rayDirection);
+			Color c = trace(theScene, pixelPointLocation, rayDirection, 0);
 			theImage.writePixel(j, i - 1, c.getR(), c.getG(), c.getB());
 		}
 	}
@@ -80,7 +80,11 @@ int main (int argc, char** argv) {
 	Shoot a ray into scene from origin in direction. Detect intersections of the ray with objects in the scene,
 	get the color at the intersection and return the color.
 */
-Color trace(Scene scene, Vector3 origin, Vector3 direction) {
+Color trace(Scene scene, Vector3 origin, Vector3 direction, int recursiveStep) {
+
+	if (recursiveStep > 5) {
+		return Color();
+	}
 
 	//for each shape in the scene
 	float t_0 = FLT_MAX;
@@ -100,37 +104,53 @@ Color trace(Scene scene, Vector3 origin, Vector3 direction) {
 
 		//if we've intersected at least one object
 		if (closest != 0) {
-			//Color diffuse = Color();
-			//go through all of the lights in the scene
-			Color i_a = Color();
+			//go through all of the lights in the scene and compute the color at the intersection point
+			Color i_a = Color(); //ambient light
 			i_a = closest->getMaterial().getColor() * scene.getAmbientLight();
-			Color i_d = Color();
-			Color i_s = Color();
-			Vector3 intersection = origin + (direction * t_0);
+
+			Color i_d = Color(); //diffuse light
+			Color i_s = Color(); //specular light
+
+			Color reflected = Color(); //reflected light
+
+			Vector3 intersection = origin + (direction * t_0); //point of intersection
+
+			//for all lights in the scene
 			for (int l = 0; l < scene.getCountLights(); l++) {
-				Vector3 a = surfaceNormal;
+
+				Vector3 n = surfaceNormal;
 				Light *light = scene.getLights()[l];
-				Vector3 b = light->getVector();
-				float distance = (b - intersection).getMagnitude();
-				Vector3 l_vec = b - intersection;
+				Vector3 l_vec = light->getVector();
 				l_vec.normalize();
 
 				//see if we have a point light or direction light
 				DirectionLight *test = dynamic_cast<DirectionLight*>(light);
 				//direction light
 				if (test != 0) {
-					i_d += light->getColor() * closest->getMaterial().getColor() * fmax(0.0, a.dot(b));
+					i_d += light->getColor() * closest->getMaterial().getColor() * fmax(0.0, n.dot(l_vec));
 				}
 				//point light
 				else {
-					i_d += (light->getColor() * closest->getMaterial().getColor() * fmax(0.0, a.dot(l_vec))) * (1 / (distance * distance));
+					l_vec = l_vec - intersection;
+					l_vec.normalize();
+					float distance = (l_vec - intersection).getMagnitude();
+					i_d += (light->getColor() * closest->getMaterial().getColor() * fmax(0.0, n.dot(l_vec))) * (1 / (distance * distance));
 				}
-				Vector3 reflection = (a * (a.dot(l_vec) * 2.0f)) - l_vec;
-				float abc = reflection.dot(direction);
+				//specular lighting
+				Vector3 r_vec =(n * (n.dot(l_vec) * 2.0f)) - (l_vec);
+				float abc = r_vec.dot(direction);
 				i_s += closest->getMaterial().getColor() * closest->getMaterial().getSpecularFrac()
-					* pow(fmax(0.0, reflection.dot(direction * -1.0f)), closest->getMaterial().getPhongExp());
+					* pow(fmax(0.0, r_vec.dot(direction * -1.0f)), closest->getMaterial().getPhongExp());
+
+				//cast rays if object is reflective
+				if (closest->getMaterial().getSpecularFrac() > 0) {
+					Vector3 v = direction * -1.0f;
+					v.normalize();
+					Vector3 v_ref = (n * n.dot(v) * 2.0f) - (v);
+					reflected += trace(scene, intersection, v_ref, recursiveStep++);
+				}
 			}
-			newColor = i_a + i_d + i_s;
+			newColor = i_a + i_d + i_s + reflected;
 			newColor.clamp();
 		}
 	}
