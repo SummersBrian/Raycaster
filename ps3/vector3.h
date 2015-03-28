@@ -46,6 +46,8 @@ public:
 
 	Vector3 & operator=(const Vector3 &rhs);
 
+	bool equals(const Vector3 &b) { return x == b.getX() && y == b.getY() && z == b.getZ(); }
+
 private:
 	float x;
 	float y;

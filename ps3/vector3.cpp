@@ -149,3 +149,4 @@ Vector3 & Vector3::operator=(const Vector3 &rhs) {
 
 	return *this;
 }
+

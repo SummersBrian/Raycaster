@@ -15,6 +15,8 @@ public:
 	
 	void setMaterial(Material newMaterial) { material = newMaterial; }
 
+	virtual bool equals(Shape *o) { return false; }
+
 private:
 	Material material;
 };
@@ -26,6 +28,11 @@ public:
 		tr_b = b;
 		tr_c = c;
 	}
+
+	const Vector3 &getVertexA() const { return tr_a; }
+	const Vector3 &getVertexB() const { return tr_b; }
+	const Vector3 &getVertexC() const { return tr_c; }
+
 	float intersect(Vector3 origin, Vector3 direction, float t, Vector3 &surfaceNormal) {
 		const float TINY = 0.01;
 		//get the normal of the plane
@@ -100,6 +107,18 @@ public:
 			sameSide(intersection, vertexB, vertexA, vertexC);
 	}
 
+	bool equals(Shape *o) {
+		Triangle *test = dynamic_cast<Triangle*>(o);
+
+		//direction light
+		if (test != 0) {
+			return tr_a.equals(test->getVertexA()) && tr_b.equals(test->getVertexB()) && tr_c.equals(test->getVertexC());
+		}
+		else {
+			return false;
+		}
+	}
+
 private:
 	Vector3 tr_a;
 	Vector3 tr_b;
@@ -117,6 +136,9 @@ public:
 		c = Vector3(x, y, z);
 		r = radius;
 	}
+
+	const Vector3 &getCenter() const { return c; }
+	float &getRadius() { return r; }
 
 	float intersect(Vector3 origin, Vector3 direction, float t, Vector3 &surfaceNormal) {
 		Vector3 w_vec = c - origin;
@@ -156,6 +178,18 @@ public:
 		//there is no root
 		else {
 			return t;
+		}
+	}
+
+	bool equals(Shape *o) {
+		Sphere *test = dynamic_cast<Sphere*>(o);
+
+		//direction light
+		if (test != 0) {
+			return c.equals(test->getCenter()) && r == test->getRadius();
+		}
+		else {
+			return false;
 		}
 	}
 
