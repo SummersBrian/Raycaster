@@ -14,6 +14,7 @@ Brian Summers - 110656609
 using namespace std;
 
 Color trace(Scene scene, Vector3 origin, Vector3 direction, int recursiveStep);
+bool inShadow(Scene scene, Vector3 origin, Vector3 direction, Shape *start);
 
 //argv[0] - program name
 //argv[1] - scene file name
@@ -82,7 +83,78 @@ int main (int argc, char** argv) {
 	get the color at the intersection and return the color.
 */
 Color trace(Scene scene, Vector3 origin, Vector3 direction, int recursiveStep) {
+	
+	//for each shape in the scene
+	float t_0 = FLT_MAX;
+	float t_prime = t_0;
+	Shape *closest = NULL;
+	Vector3 surfaceNormal = Vector3();
+	Color newColor = Color();
+	for (int k = 0; k < scene.getCountShapes(); k++) {
+		//get the intersection of the ray and the shape - returns the value of t_prime for the intersection and gets the surface normal
+		t_prime = scene.getShapes()[k]->intersect(origin, direction, t_0, surfaceNormal);
 
+		//save the closest intersection
+		if (t_prime < t_0) {
+			t_0 = t_prime;
+			closest = scene.getShapes()[k];
+		}
+	}
+
+		//if we've intersected at least one object
+		if (closest != 0) {
+			//go through all of the lights in the scene
+			Color i_a = Color();
+			i_a = closest->getMaterial().getColor() * scene.getAmbientLight();
+			Color i_d = Color();
+			Color i_s = Color();
+			Vector3 intersection = origin + (direction * t_0);
+	
+			Color reflected = Color();
+			for (int l = 0; l < scene.getCountLights(); l++) {
+				Vector3 n = surfaceNormal;
+				Light *light = scene.getLights()[l];
+				Vector3 light_dir = light->getVector();
+				float distance = (light_dir - intersection).getMagnitude();
+				Vector3 l_vec = light_dir - intersection;
+				l_vec.normalize();
+
+				//see if we have a point light or direction light
+				DirectionLight *test = dynamic_cast<DirectionLight*>(light);
+				//direction light
+				if (test != 0) {
+					if (inShadow(scene, intersection, light_dir, closest) == false) {
+						i_d += light->getColor() * closest->getMaterial().getColor() * fmax(0.0, n.dot(light_dir));
+					}
+				}
+				//point light
+				else {
+					if (inShadow(scene, intersection, light_dir - intersection, closest) == false) {
+						i_d += (light->getColor() * closest->getMaterial().getColor() * fmax(0.0, n.dot(l_vec))) * (1 / (distance * distance));
+					}
+				}
+				if (inShadow(scene, intersection, light_dir, closest) == false) {
+					light_dir.normalize();
+					Vector3 reflection = (n * (n.dot(light_dir) * 2.0f)) - light_dir;
+					float abc = reflection.dot(direction);
+					i_s += closest->getMaterial().getColor() * closest->getMaterial().getSpecularFrac()
+						* pow(fmax(0.0, reflection.dot(direction * -1.0f)), closest->getMaterial().getPhongExp());
+				}
+
+				if (closest->getMaterial().getSpecularFrac() > 0 && recursiveStep <= 5) {
+					Vector3 v = direction * -1.0f;
+					v.normalize();
+					Vector3 v_ref = (n * n.dot(v) * 2.0f) - (v);
+					reflected += trace(scene, intersection, v_ref, recursiveStep++);
+				}
+			}
+			newColor = i_a + i_d + i_s + reflected;
+			newColor.clamp();
+		}
+	
+	return newColor;
+	
+	/*
 	//for each shape in the scene
 	float t_0 = FLT_MAX;
 	float t_prime = t_0;
@@ -97,6 +169,7 @@ Color trace(Scene scene, Vector3 origin, Vector3 direction, int recursiveStep) {
 			t_0 = t_prime;
 			closest = scene.getShapes()[k];
 		}
+	}
 
 		//if we've intersected at least one object
 		if (closest != 0) {
@@ -127,42 +200,46 @@ Color trace(Scene scene, Vector3 origin, Vector3 direction, int recursiveStep) {
 				bool inShadow = false;
 				//direction light
 				if (test != 0) {
+					/*
 					Shape *blockingShape = NULL;
 					float t_1 = FLT_MAX;
 					float t1_prime = t_1;
-					for (int s = 0; s < scene.getCountLights(); s++) {
+					for (int s = 0; s < scene.getCountShapes(); s++) {
 						if (!scene.getShapes()[s]->equals(closest)) {
 							t1_prime = scene.getShapes()[s]->intersect(intersection, light_vec, t_1, Vector3());
 							if (t1_prime < t_1) {
 								inShadow = true;
-								i_d += closest->getMaterial().getColor();
+								//i_d += closest->getMaterial().getColor();
+								break;
 							}
 						}
 					}
-					if (!inShadow) {
+					if (inShadow == false) {
 						i_d += light->getColor() * closest->getMaterial().getColor() * fmax(0.0, n.dot(light_vec));
 					}
 				}
 				//point light
 				else {
+					/*
 					Shape *blockingShape = NULL;
 					float t_1 = FLT_MAX;
 					float t1_prime = t_1;
-					for (int s = 0; s < scene.getCountLights(); s++) {
+					for (int s = 0; s < scene.getCountShapes(); s++) {
 						if (!scene.getShapes()[s]->equals(closest)) {
 							t1_prime = scene.getShapes()[s]->intersect(intersection, light_vec - intersection, t_1, Vector3());
 							if (t1_prime < t_1) {
 								inShadow = true;
-								i_d += closest->getMaterial().getColor();
+								//i_d += closest->getMaterial().getColor();
+								break;
 							}
 						}
 					}
-					if (!inShadow) {
+					if (inShadow == false) {
 						i_d += (light->getColor() * closest->getMaterial().getColor() * fmax(0.0, n.dot(light_pos))) * (1 / (distance * distance));
 					}
 				}
 				//specular lighting
-				if (!inShadow) {
+				if (inShadow == false) {
 					light_vec.normalize();
 					Vector3 r_vec = (n * (n.dot(light_vec) * 2.0f)) - (light_vec);
 					float abc = r_vec.dot(direction);
@@ -170,7 +247,7 @@ Color trace(Scene scene, Vector3 origin, Vector3 direction, int recursiveStep) {
 						* pow(fmax(0.0, r_vec.dot(direction * -1.0f)), closest->getMaterial().getPhongExp());
 				}
 				else {
-					i_s += closest->getMaterial().getColor();
+					//i_s += closest->getMaterial().getColor();
 				}
 
 				//cast rays if object is reflective
@@ -188,7 +265,20 @@ Color trace(Scene scene, Vector3 origin, Vector3 direction, int recursiveStep) {
 				newColor;
 			}
 		}
-	}
 	return newColor;
+	*/
 
+}
+
+bool inShadow(Scene scene, Vector3 origin, Vector3 direction, Shape *start) {
+	float t1 = FLT_MAX;
+	for (int s = 0; s < scene.getCountShapes(); s++) {
+		if (start->equals(scene.getShapes()[s]) == false) {
+			t1 = scene.getShapes()[s]->intersect(origin, direction, FLT_MAX, Vector3());
+			if (t1 < FLT_MAX) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
