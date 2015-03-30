@@ -7,8 +7,17 @@
 
 class Shape {
 public:
-	//Shape() {}
-
+	
+	/*
+	Determines if a ray intersects this Triangle, computes the surface normal at the
+	point of intersection, and returns the parametric t value in which the intersection
+	occurs
+	@param origin the origin of the ray being cast
+	@param direction the direction of the ray being cast
+	@float t closest intersection t value
+	@param surfaceNormal the normal to the Triangle
+	@return float t
+	*/
 	float virtual intersect(Vector3 origin, Vector3 direction, float t, Vector3 &surfaceNormal) { return t; }
 
 	const Material &getMaterial() const { return material; }
@@ -78,6 +87,13 @@ public:
 
 	}
 
+	/*
+		Determines if point lies on the same side of the edge AB that C does
+		@param vertexA a vertex on the triangle
+		@param vertexB a vertex on the triangle
+		@param vertexC a vertex on the triangle
+		@return bool true if intersection is on the same side as C and false otherwise
+	*/
 	bool sameSide(Vector3 intersection, Vector3 vertexC, Vector3 vertexA, Vector3 vertexB) {
 		//using orthographic project -- ignore z values
 		intersection.setZ(0.0f);
@@ -101,12 +117,24 @@ public:
 		}
 	}
 
-	//uses sameSide() to determine if the intersection is within the triangle by comparing with all edges
+	/*
+		Determines if a point lies within the Triangle
+		@param intersection the point of intersection with the plane the Triangle is on
+		@param vertexA a vertex of the triangle
+		@param vertexB a vertex of the triangle
+		@param vertexC a vertex of the triangle
+		@return bool true if the point is in the triangle and false otherwise
+	*/
 	bool pointInTriangle(Vector3 intersection, Vector3 vertexA, Vector3 vertexB, Vector3 vertexC) {
 		return sameSide(intersection, vertexC, vertexA, vertexB) && sameSide(intersection, vertexA, vertexB, vertexC) &&
 			sameSide(intersection, vertexB, vertexA, vertexC);
 	}
 
+	/*
+		Determines whether this Triangle equals another Triangle
+		@param o pointer to a Shape
+		@return bool if this Triangle has the same three vertices as the other Triangle and false otherwise
+	*/
 	bool equals(Shape *o) {
 		Triangle *test = dynamic_cast<Triangle*>(o);
 
@@ -181,6 +209,11 @@ public:
 		}
 	}
 
+	/*
+		Determines whether this Sphere equals another Sphere
+		@param o pointer to another Shape
+		@return bool true if this Sphere has the same center and radius as another Sphere and false otherwise
+	*/
 	bool equals(Shape *o) {
 		Sphere *test = dynamic_cast<Sphere*>(o);
 

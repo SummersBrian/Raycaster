@@ -81,6 +81,11 @@ int main (int argc, char** argv) {
 /*
 	Shoot a ray into scene from origin in direction. Detect intersections of the ray with objects in the scene,
 	get the color at the intersection and return the color.
+	@param scene the scene the ray is cast in
+	@param origin origin of the ray being cast
+	@param direction the direction in which to cast the ray
+	@param recursiveStep the depth of recursion of this ray (maximum of 5 recursive steps)
+	@return Color at the intersection of the ray and an object in the scene
 */
 Color trace(Scene scene, Vector3 origin, Vector3 direction, int recursiveStep) {
 	
@@ -111,6 +116,7 @@ Color trace(Scene scene, Vector3 origin, Vector3 direction, int recursiveStep) {
 			Vector3 intersection = origin + (direction * t_0);
 	
 			Color reflected = Color();
+			//for all the lights in the scene
 			for (int l = 0; l < scene.getCountLights(); l++) {
 				Vector3 n = surfaceNormal;
 				Light *light = scene.getLights()[l];
@@ -133,6 +139,8 @@ Color trace(Scene scene, Vector3 origin, Vector3 direction, int recursiveStep) {
 						i_d += (light->getColor() * closest->getMaterial().getColor() * fmax(0.0, n.dot(l_vec))) * (1 / (distance * distance));
 					}
 				}
+
+				//specular lght
 				if (inShadow(scene, intersection, light_dir, closest) == false) {
 					light_dir.normalize();
 					Vector3 reflection = (n * (n.dot(light_dir) * 2.0f)) - light_dir;
@@ -141,6 +149,7 @@ Color trace(Scene scene, Vector3 origin, Vector3 direction, int recursiveStep) {
 						* pow(fmax(0.0, reflection.dot(direction * -1.0f)), closest->getMaterial().getPhongExp());
 				}
 
+				//reflections
 				if (closest->getMaterial().getSpecularFrac() > 0 && recursiveStep <= 5) {
 					Vector3 v = direction * -1.0f;
 					v.normalize();
@@ -155,11 +164,23 @@ Color trace(Scene scene, Vector3 origin, Vector3 direction, int recursiveStep) {
 	return newColor;
 }
 
+/*
+	Determines if a point of intersection is shaded by an object between the intersection and a light source
+	@param scene the scene the ray is cast in
+	@param origin the origin of the intersection in which this ray is being cast from
+	@param direction the direction to cast the ray to the light source
+	@param start a pointer to the Shape that the ray originates from
+	@return bool true if there is an intersection detected between the start shape and the light source and false otherwise
+*/
 bool inShadow(Scene scene, Vector3 origin, Vector3 direction, Shape *start) {
 	float t1 = FLT_MAX;
+	//go through all the shapes
 	for (int s = 0; s < scene.getCountShapes(); s++) {
+		//if this shape does not equal the start shape
 		if (start->equals(scene.getShapes()[s]) == false) {
+			//determine the intersection
 			t1 = scene.getShapes()[s]->intersect(origin, direction, FLT_MAX, Vector3());
+			//if there is an intersection
 			if (t1 < FLT_MAX) {
 				return true;
 			}
